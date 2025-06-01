@@ -1,24 +1,29 @@
+/* v 0.1.1 ：将note()函数集成至SimpleTone库内了。*/
+/*
+ 请在你使用这个库的时候在主程序内添加以下这个函数。
+ 因为Python转换脚本并不知道你的实例名是什么，这么做保证Python脚本简单易用的同时代码同样保持简洁。
+  ```c
+  void note(uint32_t freq, float duration_sec);{
+    实例名.note(freq, duration_sec);
+  }
+  ```
+*/
 #pragma once
-#include <Arduino.h>
-#include "stm32f4xx_hal.h"
-
-#ifndef
-  #define true 1
-  #define false 0
-#endif
+#include <Arduino.h> // 在使用纯HAL库开发时注释掉这行即可
+#include <stm32f4xx_hal.h>
 
 //节拍表
 #ifndef bpm
- #define bpm 150.0 //beat per minute 默认bpm150
+ #define bpm 160.0 // beat per minute 主程序内未定义bpm则默认bpm160
 #endif
 
-#define rest 0 //休止符
-#define beat (60.0/bpm) //四四拍，每拍一个四分音符
-#define quaver beat/2.0 //八分音符
-#define quater beat //四分音符
-#define half beat*2.0 //二分音符
-#define whole beat*4.0 //全音符
-#define dotted 1.5* //附点
+#define rest 0            // 休止符
+#define beat (60.0/bpm)   // 四四拍，每拍一个四分音符
+#define quaver beat/2.0   // 八分音符
+#define quater beat       // 四分音符
+#define half beat*2.0     // 二分音符
+#define whole beat*4.0    // 全音符
+#define dotted 1.5*       // 附点音符
 
 //音符表
 #define A3 440
@@ -46,6 +51,11 @@ public:
   void tone(uint32_t freq, float duration_sec = 0); // 频率+可选时长（秒）
   void noTone(); // 停止PWM输出
   void handle(); // 轮询调用，处理超时自动关闭
+
+  void note(uint32_t freq, float duration_sec); // 音符函数。
+  // 它相当于直接集成了tone(), handle()的功能，自动轮询音符时长，自动关闭。
+  // 里面包含一个HAL_Delay(1)用于避免过长时间高速占用IO与CPU，理论上来说不会过度占用程序。
+  // 在后期对RTOS进行优化后，会使用其他办法代替该delay。
 
 private:
   GPIO_TypeDef* _GPIOx;

@@ -2,6 +2,7 @@
 
 // 选择TIM4通道3对应PD14，对应C板电路
 
+// SimpleTone类，实例化你的输出引脚。请确认它支持定时器与PWM输出。
 SimpleTone::SimpleTone(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
   : _GPIOx(GPIOx), _GPIO_Pin(GPIO_Pin), _active(false), _endTime(0)
 {
@@ -14,7 +15,7 @@ void SimpleTone::begin() {
     __HAL_RCC_GPIOD_CLK_ENABLE();
     __HAL_RCC_TIM4_CLK_ENABLE();
 
-    // GPIO初始化为复用推挽
+    // GPIO初始化为复用推挽。若已在CubeMX内定义，可以看情况注释以下函数。
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     GPIO_InitStruct.Pin = _GPIO_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -32,7 +33,7 @@ void SimpleTone::begin() {
     _htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 
     if (HAL_TIM_PWM_Init(&_htim) != HAL_OK) {
-      // 错误处理（简单示意）
+      // 错误处理（简单示意） 我还没写！想在这里做debug的可以在这里加。
       while (1);
     }
 
@@ -44,6 +45,7 @@ void SimpleTone::begin() {
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
 
     if (HAL_TIM_PWM_ConfigChannel(&_htim, &sConfigOC, _tim_channel) != HAL_OK) {
+      // 此处应当也要有错误处理与debug代码！
       while (1);
     }
   }
@@ -94,4 +96,10 @@ void SimpleTone::handle() {
       return;
     }
   }
+}
+
+void SimpleTone::note(uint32_t freq, float duration_sec) {
+  tone(freq, duration_sec);
+  handle(); // 等待播放完毕，用buzzer.handle()轮询
+  HAL_Delay(1); // 若使用FreeRTOS，请将此delay更改为vTaskDelay！
 }

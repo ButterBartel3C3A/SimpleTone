@@ -1,6 +1,6 @@
 import sys
 import os
-import mido  # 修复 MidiFile 未定义问题
+import mido  # midu库无法使用from import的方式调用，必须整库调用，以避免报错。
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QLineEdit,
     QPushButton, QFileDialog, QVBoxLayout, QMessageBox
@@ -17,13 +17,17 @@ NOTE_DURATIONS = {
     0.25: "quaver /2"
 }
 
+# 出于对蜂鸣器音色听感的考虑，所有的音符都与国际标准音与mido库标准音高相比提高了一个八度。
+# 这使得音符更清晰，避免低音过重。
+# 如果你想要还原真实的音高，请将BASE_NOTES中的音符前的键的数值（key）全部+12。
 BASE_NOTES = {
-    69: "A4", 70: "A4sharp", 71: "B4",
-    60: "C4", 61: "C4sharp", 62: "D4", 63: "D4sharp", 64: "E4",
-    65: "F4", 66: "F4sharp", 67: "G4", 68: "G4sharp",
-    57: "A3", 58: "A3sharp", 59: "B3"
+    57: "A4", 58: "A4sharp", 59: "B4",
+    48: "C4", 49: "C4sharp", 50: "D4", 51: "D4sharp", 52: "E4",
+    53: "F4", 54: "F4sharp", 55: "G4", 56: "G4sharp",
+    45: "A3", 46: "A3sharp", 47: "B3"
 }
 
+# MIDI音符量化函数
 def quantize(duration_beats):
     best = min(NOTE_DURATIONS.keys(), key=lambda x: abs(x - duration_beats))
     err = abs(best - duration_beats)
@@ -40,6 +44,7 @@ def quantize(duration_beats):
             return None, duration_beats  # 无法量化，返回 None 和原始时值
     return NOTE_DURATIONS[best], duration_beats / best
 
+# MIDI音符转换为文本标签
 def pitch_to_text(midi_note):
     for base in BASE_NOTES:
         for i in range(-3, 4):
@@ -50,6 +55,7 @@ def pitch_to_text(midi_note):
                 return BASE_NOTES[base] + tag
     return f"MIDI{midi_note}"
 
+# MIDI主处理函数逻辑
 def process_midi(path, output_path=None, bpm_override=None, beat_sig="4/4", analyze_only=False):
     midi = mido.MidiFile(path)
     ticks_per_beat = midi.ticks_per_beat
@@ -133,6 +139,9 @@ def process_midi(path, output_path=None, bpm_override=None, beat_sig="4/4", anal
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
+#####################
+# 以下为GUI界面代码 #
+#####################
 class MidiToTextApp(QWidget):
     def __init__(self):
         super().__init__()
