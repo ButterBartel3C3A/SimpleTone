@@ -4,7 +4,7 @@
 /* Author：人造黄油（ButterBartel3C3A）*/
 /* 广告位：请大家支持天津理工大学Nirnava战队喵谢谢喵 */
 
-#include<stm32f407xx.h>
+#include <stm32f4xx_hal.h>
 #include<Arduino.h>
 
 #define bpm 180.0 //定义曲速
