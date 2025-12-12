@@ -4,13 +4,17 @@
  因为Python转换脚本并不知道你的实例名是什么，这么做保证Python脚本简单易用的同时代码同样保持简洁。
   ```c
   void note(uint32_t freq, float duration_sec);{
-    实例名.note(freq, duration_sec);
+    {实例名}.note(freq, duration_sec);
   }
   ```
 */
 #pragma once
 #include <Arduino.h> // 在使用纯HAL库开发时注释掉这行即可
-#include <stm32f4xx_hal.h>
+#include <stm32f4xx_hal.h> //请根据你使用的MCU来选择对应的头文件
+#ifdef USE_FREERTOS
+  #include "FreeRTOS.h"
+  #include "task.h"
+#endif
 
 //节拍表
 #ifndef bpm

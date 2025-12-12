@@ -1,14 +1,15 @@
 /* v 0.1.1 ：将note()函数集成至SimpleTone库内了。*/
+/* v 0.1.2 ：增加了对RTOS的支持。*/
 /* 这是一个例程。为了使例程能够直接烧录，使用与库同名的.ino编写该例程。*/
 /* 现在这份例程可以直接烧录到C板上播放春日影！*/
 /* Author：人造黄油（ButterBartel3C3A）*/
 /* 广告位：请大家支持天津理工大学Nirnava战队喵谢谢喵 */
 
 #include <stm32f4xx_hal.h>
-#include<Arduino.h>
+#include <Arduino.h>
 
 #define bpm 180.0 //定义曲速
-#include<SimpleTone.h> //若使用自定义bpm，调用SimpleTone库前就需要定义bpm
+#include <SimpleTone.h> //若使用自定义bpm，调用SimpleTone库前就需要定义bpm
 
 // 实例化蜂鸣器，使用PD14作为输出引脚
 SimpleTone buzzer(GPIOD, GPIO_PIN_14); // 由于STM32duino框架的varient.h内未定义GPIOD系列引脚，故此行请使用HAL库语法进行实例化。

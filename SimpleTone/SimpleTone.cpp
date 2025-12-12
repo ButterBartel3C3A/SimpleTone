@@ -101,5 +101,9 @@ void SimpleTone::handle() {
 void SimpleTone::note(uint32_t freq, float duration_sec) {
   tone(freq, duration_sec);
   handle(); // 等待播放完毕，用buzzer.handle()轮询
-  HAL_Delay(1); // 若使用FreeRTOS，请将此delay更改为vTaskDelay！
+  #ifdef USE_FREERTOS
+    vTaskDelay(1); // 若使用FreeRTOS，使用vTaskDelay替代HAL_Delay
+  #else
+    HAL_Delay(1); // 若未使用FreeRTOS，使用HAL_Delay
+  #endif
 }
